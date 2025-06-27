@@ -101,40 +101,30 @@ bool RPN::check_operator(std::string::iterator it, std::string str)
     int check = -1;
     int check2 = -1;
     int check3 = -1;
-    // check le tout debut
-    // std::cout << "voici ce que je check" << std::endl;
-    // std::cout << isdigit(str[0]) << " str[0] " << str[0] << std::endl;
-    // std::cout << isdigit(str[2]) << " str[2] " << str[2] << std::endl;
-    // std::cout << check_char(it + 5) << std::endl;
-    // std::cout << str[0] << str[1] << str[2] << str[3] << str[4] << str[5] << std::endl;
+    int cpt_op = 0;
+    int cpt_nb = 1;
     if (isdigit(str[0]) == 0 || isdigit(str[2]) == 0 || check_char(it + 4) != 2)
         return 1;
     size_t i = 0;
     it_tmp += 5;
     while (i < str.size() - 5)
     {
-        // std::cout << str << "!" << std::endl;
         check = check_char(it_tmp);
         if (*it_tmp == ' ')
             check = 4;
-        // std::cout << "it_tmp = " << *it_tmp << std::endl;
         if ((check == check2 && check2 != -1) || (check2 == check3 && check3 != -1))
-        {
-            // std::cout << "check = " << check << " check2 = " << check2 << " check3 = " << check3 << std::endl;
-            // std::cout << "ici" << std::endl;
             return 1;
-        }
+        if (*it_tmp >= 48 && *it_tmp <= 57)
+            cpt_nb++;
+        else if (*it_tmp == '*' || *it_tmp == '+'
+            || *it_tmp == '/' || *it_tmp == '-')
+            cpt_op++;
         it_tmp++;
         i++;
         check3 = check2;
         check2 = check;
-        // std::cout << i << std::endl;
-        // std::cout << str.size() << std::endl;
     }
-    //chercher derniere position de mon nb, check ensuite s'il y a plus de 2 operator
-    while (i )
-    {
-        
-    }
+    if (cpt_nb - cpt_op != 1)
+        return 1;
     return 0;
 }
