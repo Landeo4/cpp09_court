@@ -21,6 +21,8 @@ class BitcoinExchange
     bool verify_line(std::string line);
     bool fill_container();
     void execute_line(char *buf, double *tmp, std::string str);
+    bool check_charac(std::ifstream file, std::string str);
+
 
 
     private:

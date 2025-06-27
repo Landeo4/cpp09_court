@@ -91,67 +91,11 @@ void Algo::start_algo(size_t pair_ratio, std::vector<double> &vec)
         print_container(vec);
         return ;
     }
-    Jacobstal(pair_ratio, actual_pair, vec);
-    // tri_dicoto(pair_ratio, actual_pair, vec);
+    // Jacobstal(pair_ratio, actual_pair, vec);
+    tri_dicoto(pair_ratio, actual_pair, vec);
 }
 
-void Algo::Jacobstal(size_t pair_ratio, size_t actual_pair, std::vector<double> &vec)
-{
-    int jacob[] = {3, 5, 11, 21, 43, 85, 171, 341, 683, 1365, 2731, 5461, 10923, 21845, 43691, 87381, 174763, 349525};
-    unsigned int num = vec.size();
-
-    // while (reach < total)
-    // {
-        //     if (reach == pl_check)
-    //     {
-    //         // std::cout << "reach et pl_check " << reach << " " << pl_check << std::endl;
-    //         for(size_t i = 0; i < pair_ratio; i++)
-    //         {
-    //             // std::cout << "valeur de vecteur " << *vec_it << std::endl;
-    //             vec_buf.push_back(*vec_it);
-    //             vec_it = vec.erase(vec_it);
-    //         }
-    //         reach++;
-    //         pl_check += 2;
-    //     }
-    //     vec_it += pair_ratio;
-    //     reach++;
-    // }
-    // creation liste trier et non trier
-    tri_dicoto(pair_ratio, actual_pair, vec, jacob[num]);
-    while (jacob[num] > 0)
-    {
-        if (jacob[num] < 0)
-        {
-            std::cout << "j'ai atteint la limite " << std::endl;
-            return ;
-        }
-        unsigned int nb = jacob[num];
-        std::cout << "voici le num avec lequel je rentre" << std::endl;
-        std::cout << nb << " et la position dans jacob" << num << std::endl;
-        tri_dicoto(pair_ratio, actual_pair, vec, nb);
-        num--;
-    }
-}
-
-// cree un moyen de trouver le nb a placer
-
-// si 10 groupes dans non trier
-// Jacob stal permet d'utiliser la liste trier
-
-// donc la je dois envoyer une partie de ma string
-// calculer combien de ma string je dois envoyer via jacob-stal dans mon tri_dicoto
-
-// pour Jacobstal peut etre que je dois envoyer qu'une partie de ma liste
-// genre si dans ma liste j'en suis au nombre 11, j'envois uniquement la partie avec 11
-// ou j'envois mon 11 pour qu'il sois trier tout seul
-
-// OU sinon j'isole le nombre qui doit trouver son endroit puis je le supprime ou
-// le laisse dans la liste et je cherche son milieu, a l'issue de ca, je le deplace
-// JE PENSE QUE C'EST CA
-// ELi a confirmer la theorie
-
-void Algo::tri_dicoto(size_t pair_ratio, size_t actual_pair, std::vector<double> &vec, unsigned int nb)
+void Algo::tri_dicoto(size_t pair_ratio, size_t actual_pair, std::vector<double> &vec unsigned int nb)
 {
     std::vector<double> vec_buf;
     std::vector<double>::iterator vec_it = vec.begin();
@@ -208,7 +152,7 @@ void Algo::tri_dicoto(size_t pair_ratio, size_t actual_pair, std::vector<double>
     std::vector<double>::iterator bot = vec.begin();
     int pair_size = vec_buf.size();
     buf_it = vec_buf.begin();
-    // nb = vec_buf[pair_ratio - 1]; a garder
+    nb = vec_buf[pair_ratio - 1]; a garder
     while (pair_size > 0)
     {
         top = vec.end();

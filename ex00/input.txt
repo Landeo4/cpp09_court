@@ -16,3 +16,4 @@ date | value
 2013-44654564546565-28 | 33.36
 2012-01-11 | 2147483647889879
 2013-02-28 | 33.362013-02-28 | 33.36
+si empty line, si texte et si lettre dans la ligne

@@ -34,12 +34,31 @@ bool BitcoinExchange::check_file(char **argv)
         return false;
     }
     getline(file, str, '\n');
+    if (str != "date | value")
+    {
+        std::cout << "first line should be: date | value " << std::endl;
+        return false;
+    }
+    // suel charac a autoriser: ' ', '|', '-', 'nombre', '\n'
+    if (check_charac(file, str) == 1)
+        return false;
     for (; file.eof() != 1;)
     {
         getline(file, str, '\n');
         verify_line(str);
     }
     return true;
+}
+
+bool BitcoinExchange::check_charac(std::ifstream file, std::string str)
+{
+    
+    std::cout << "voici la str" << str << std::endl;
+    for (; file.eof() != 1;)
+    {
+        getline(file, str, '\n');
+    }
+    return 0;
 }
 
 bool BitcoinExchange::fill_container()
