@@ -95,6 +95,8 @@ int RPN::check_char(std::string::iterator it)
 }
 
 // check -> si doublon + si si ca fais nb puis signe
+//corriger multi nombre, multi signe
+
 bool RPN::check_operator(std::string::iterator it, std::string str)
 {
     std::string::iterator it_tmp = it;

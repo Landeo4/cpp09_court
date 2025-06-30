@@ -95,14 +95,13 @@ void Algo::start_algo(size_t pair_ratio, std::vector<double> &vec)
     tri_dicoto(pair_ratio, actual_pair, vec);
 }
 
-void Algo::tri_dicoto(size_t pair_ratio, size_t actual_pair, std::vector<double> &vec unsigned int nb)
+void Algo::tri_dicoto(size_t pair_ratio, size_t actual_pair, std::vector<double> &vec)
 {
     std::vector<double> vec_buf;
     std::vector<double>::iterator vec_it = vec.begin();
     std::vector<double>::iterator buf_it;
     size_t pl_check = 2;
     (void)actual_pair;
-    (void)nb;
 
     // std::cout << "I === debut de tri_dicoto ===" << std::endl; 
     // std::cout << "container au debut de tri_dicoto" << std::endl;
@@ -152,7 +151,8 @@ void Algo::tri_dicoto(size_t pair_ratio, size_t actual_pair, std::vector<double>
     std::vector<double>::iterator bot = vec.begin();
     int pair_size = vec_buf.size();
     buf_it = vec_buf.begin();
-    nb = vec_buf[pair_ratio - 1]; a garder
+    int nb = 0;
+    nb = vec_buf[pair_ratio - 1]; //a garder
     while (pair_size > 0)
     {
         top = vec.end();

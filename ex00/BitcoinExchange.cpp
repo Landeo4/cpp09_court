@@ -25,6 +25,7 @@ BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange & copy)
 bool BitcoinExchange::check_file(char **argv)
 {
     std::ifstream file(argv[1]);
+    std::ifstream file2(argv[1]);
     std::string str;
     if (fill_container() == 1)
         return 1;
@@ -39,26 +40,13 @@ bool BitcoinExchange::check_file(char **argv)
         std::cout << "first line should be: date | value " << std::endl;
         return false;
     }
-    // suel charac a autoriser: ' ', '|', '-', 'nombre', '\n'
-    if (check_charac(file, str) == 1)
-        return false;
+    // seul charac a autoriser: ' ', '|', '-', 'nombre', '\n'
     for (; file.eof() != 1;)
     {
         getline(file, str, '\n');
         verify_line(str);
     }
     return true;
-}
-
-bool BitcoinExchange::check_charac(std::ifstream file, std::string str)
-{
-    
-    std::cout << "voici la str" << str << std::endl;
-    for (; file.eof() != 1;)
-    {
-        getline(file, str, '\n');
-    }
-    return 0;
 }
 
 bool BitcoinExchange::fill_container()
@@ -87,10 +75,30 @@ bool BitcoinExchange::fill_container()
     return false;
 }
 
+// a | a
+//corriger les -inf et les overflow
+
 bool BitcoinExchange::verify_line(std::string str)
 {
     char buf1[4];
     double tmp[4];
+    if (str.size() == 0)
+    {
+        std::cout << "Error: empty line" << std::endl;
+        return 1;
+    }
+    else
+    {
+        int nb = str.size();
+        int i = 0;
+        while ((str[i] == ' ' || str[i] == '\t' || str[i] == '\r' || str[i] == '\n' || str[i] == '\v' || str[i] == '\f') && str[i])
+            i++;
+        if (i == nb)
+        {
+            std::cout << "your line does not respect the form" << std::endl;
+            return 1;
+        }
+    }
     str.copy(buf1, 4, 0);
     try
     {
@@ -106,14 +114,53 @@ bool BitcoinExchange::verify_line(std::string str)
     for (int i = 0; buf1[i]; i++)
         buf1[i] = 0;
     str.copy(buf1, 2, 5);
+    int i = 0;
+    if (str[4] != '-' || str[7] != '-')
+    {
+        std::cout << "bad input, miss - or there is not only digit in your date" << std::endl;
+        return 1; 
+    }
+    while (str[i] && i < 10)
+    {
+        if (i == 4 || i == 7)
+            i++;
+        if (str[i] < 48 || str[i] > 57)
+        {
+            std::cout << "there not only digit in your date" << std::endl;
+            return 1;
+        }
+        i++;
+    }
+    i = 13;
+    if (str[12] != ' ')
+    {
+        std::cout << "a | is missing between date and value or you put too mutch space" << std::endl;
+        return 1;
+    }
+    for (int cpt = 0; str[i]; i++)
+    {
+        if (str[i] == '.')
+            cpt++;
+        if (cpt == 2)
+        {
+            std::cout << "too many dot in your input" << std::endl;
+            return 1;
+        }
+        if ((str[i] < 48 || str[i] > 57) && str[i] != '.')
+        {
+            std::cout << "there not only digit in your value" << std::endl;
+            return 1;
+        }
+    }
+    //check si espace
     for (int i = 0; i < 2; i++)
     {
         try
         {
             tmp[i] = atoi(buf1);
-            if (tmp[i] > 31 && i == 0)// verif la date
+            if (tmp[i] > 12 && i == 0)// verif la date
             {
-                std::cout << "Error: bad date input => " << tmp[i] << std::endl;
+                std::cout << "Error: bad month input => " << tmp[i] << std::endl;
                 return true;
             }
             else if (tmp[i] < 0 && i == 0)
@@ -126,9 +173,9 @@ bool BitcoinExchange::verify_line(std::string str)
                 std::cout << "Error: not a positive number => " << tmp[i] << std::endl;
                 return true;
             }
-            else if (tmp[i] > 12 && i == 1)
+            else if (tmp[i] > 31 && i == 1)
             {
-                std::cout << "Error: bad month input => " << tmp[i] << std::endl;
+                std::cout << "Error: date month input => " << tmp[i] << std::endl;
                 return true;
             }
         }
@@ -163,6 +210,7 @@ bool BitcoinExchange::verify_line(std::string str)
         std::cout << "Error, wrong value" << std::endl;
         return true;
     }
+    // std::cout << "=====" << std::endl << "voici les infos que j'ai recup " << buf1 << " !!! " << tmp << " !!! " << str << std::endl;
     execute_line(buf1, tmp, str);
     return false;
 }
@@ -172,7 +220,46 @@ void BitcoinExchange::execute_line(char *buf, double *tmp, std::string str)
     (void)buf;
     (void)tmp;
     std::string wait(str.substr(0, 10));
-    if (_ma.find(wait) != _ma.end())
+    if (wait.empty())
+        return ;
+    // copier ma date et voir si elle est inf a la date minimal ou maximal
+    std::string bel1 = str.substr(0, 4);
+    std::string bel2 = str.substr(5, 2);
+    std::string bel3 = str.substr(8, 2);
+    // std::cout << "voici bel" << bel1 << std::endl;
+    // std::cout << "voici bel" << bel2 << std::endl;
+    // std::cout << "voici bel" << bel3 << std::endl;
+    //2009-01-02,0
+    //2022-03-29,47115.93
+    if (atoi(bel1.c_str()) == 2009 && bel2 == "01" && atoi(bel3.c_str()) < 2)
+    {
+        std::cout << "there is no close data available" << std::endl;
+        return ;
+    }
+    else if (atoi(bel1.c_str()) < 2009)
+    {
+        std::cout << "there is no close data available" << std::endl;
+        return ;
+    }
+    else if ((atoi(bel1.c_str()) > 2022) && (atoi(bel1.c_str()) > 3 || atoi(bel1.c_str()) > 29))
+    {
+        //mettre la date en dur + le calcul
+        // 47115.93 * le nb en question
+        std::map<std::string, float>::iterator it;
+        it = _ma.lower_bound(wait);
+        it--;
+        // std::cout << "voici id->second" << it->second << std::endl;
+        int nb = it->second;
+        int len = str.length() - 12;
+        std::string cpy(str.substr(12, len));
+        float nb2 = std::atof(cpy.c_str());
+        float result = nb * nb2;
+        if (result > float(2147483647))
+            std::cout << "cannot print the result" << std::endl;
+        else
+            std::cout << "2022-03-29 => " << tmp[3] << " = " << result << std::endl;
+    }
+    else if (_ma.find(wait) != _ma.end())
     {
         std::map<std::string, float>::iterator it = _ma.find(wait);
         std::string af = str.substr(0, 10);
@@ -190,25 +277,9 @@ void BitcoinExchange::execute_line(char *buf, double *tmp, std::string str)
         float nb = it->second;
         float nb2 = std::atof(cpy.c_str());
         float result = nb * nb2;
-        std::cout << af << " => " << tmp[3] << " = " << result << std::endl;
+        if (result > float(2147483647))
+            std::cout << "cannot print the result" << std::endl;
+        else
+            std::cout << af << " => " << tmp[3] << " = " << result << std::endl;
     }
 }
-
-// lower bond
-
-// fill le container avec les en string, les date puis en valeur double
-// 2011-01-03 => 3 = 0.9
-
-// void BitcoinExchange::fill_container(std::string str)
-// {
-//     // std::cout << "string de base " << str << std::endl;
-//     std::string tmp;
-//     tmp = str.substr(0, 10);
-//     int len = str.length() - tmp.length() - 3;
-//     double nb;
-//     // je passe a la valeur
-//     std::string buf = str.substr(13, len);
-//     nb = std::atof(buf.c_str());
-//     this->_ma[tmp] = nb;
-//     std::cout << tmp << " => " << this->_ma[tmp] << std::endl;
-// }
